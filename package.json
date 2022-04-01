@@ -1,0 +1,71 @@
+{
+  "name": "solid-boundaries",
+  "description": "a utility to track the boundaries of html-elements in solid-js",
+  "version": "1.0.0",
+  "author": "Erik Verweij",
+  "contributors": [
+    {
+      "name": "Erik Verweij",
+      "email": "info@erikverweij.com",
+      "url": "http://www.erikverweij.dev"
+    }
+  ],
+  "license": "MIT",
+  "main": "dist/solid-boundaries.cjs.js",
+  "typings": "dist/index.d.ts",
+  "module": "dist/solid-boundaries.es.js",
+  "size-limit": [
+    {
+      "path": "dist/solid-boundaries.cjs.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/solid-boundaries.es.js",
+      "limit": "10 KB"
+    }
+  ],
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": false,
+    "tabWidth": 2,
+    "trailingComma": "none",
+    "arrowParens": "avoid"
+  },
+  "scripts": {
+    "start": "vite",
+    "prepare": "husky install",
+    "lint": "eslint '**/*.{ts,tsx}' -c .eslintrc.js --quiet --fix",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "precommit": "npm run typecheck && npm run lint",
+    "size": "size-limit",
+    "test": "vitest",
+    "postinstall": "node ./fix-jest-dom.mjs"
+  },
+  "peerDependencies": {
+    "solid-js": ">=1.0.0"
+  },
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^7.0.8",
+    "@testing-library/jest-dom": "^5.16.3",
+    "@typescript-eslint/eslint-plugin": "^5.17.0",
+    "@typescript-eslint/parser": "^5.17.0",
+    "eslint": "^8.12.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.4",
+    "jsdom": "^19.0.0",
+    "prettier": "^2.6.1",
+    "rollup-plugin-typescript2": "^0.31.2",
+    "size-limit": "^7.0.8",
+    "solid-js": "^1.3.13",
+    "solid-testing-library": "^0.3.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.6.3",
+    "vite": "^2.9.1",
+    "vite-plugin-solid": "^2.2.6",
+    "vitest": "^0.8.2"
+  }
+}

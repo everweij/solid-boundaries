@@ -1,0 +1,30 @@
+{
+  "include": ["src", "types"],
+  "compilerOptions": {
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "alwaysStrict": true,
+    "checkJs": false,
+    "declaration": true,
+    "stripInternal": true,
+    "downlevelIteration": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "isolatedModules": true,
+    "moduleResolution": "Node",
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
+    "types": ["vitest/globals"],
+    "sourceMap": true,
+    "rootDir": "./src",
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
+  }
+}
