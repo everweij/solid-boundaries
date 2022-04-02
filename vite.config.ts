@@ -3,30 +3,24 @@
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import path from "path";
-import typescript from "rollup-plugin-typescript2";
 
 export default defineConfig({
   plugins: [solidPlugin()],
   build: {
     lib: {
       formats: ["cjs", "es"],
-      entry: path.resolve(__dirname, "src/index.tsx"),
-      fileName: format => `solid-boundaries.${format}.js`
+      entry: path.resolve(__dirname, "src/index.ts")
     },
     rollupOptions: {
       treeshake: true,
       external: ["solid-js"],
-      plugins: [
-        typescript({
-          check: true,
-          tsconfig: path.resolve(__dirname, "tsconfig.json"),
-          tsconfigOverride: {
-            declarationOnly: true,
-            declaration: true,
-            exclude: ["**/*.test.tsx", "**/*.test.ts"]
-          }
-        })
-      ]
+      input: {
+        index: path.resolve(__dirname, "src/index.ts"),
+        server: path.resolve(__dirname, "src/server.ts")
+      },
+      output: {
+        entryFileNames: () => "[name].[format].js"
+      }
     }
   },
   test: {
