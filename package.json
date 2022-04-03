@@ -58,6 +58,7 @@
   "scripts": {
     "start": "vite",
     "prepare": "husky install",
+    "prepublish": "npm run build",
     "lint": "eslint '**/*.{ts,tsx}' -c .eslintrc.js --quiet --fix",
     "build": "vite build && tsc -p tsconfig.typings.json",
     "typecheck": "tsc --noEmit",
