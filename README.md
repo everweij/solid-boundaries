@@ -4,7 +4,7 @@ A utility to track the boundaries of html-elements in solid-js
 
 ## What does it do?
 
-See it in action [here](https://codesandbox.io/s/solid-boundaries-example-7j26ix?file=/src/main.tsx)!
+See it in action [here](https://7j26ix.sse.codesandbox.io/), or see it on [CodeSandbox](https://codesandbox.io/s/solid-boundaries-example-7j26ix?file=/src/main.tsx)!
 
 This small library exposes a small reactive primitive which tracks the _boundaries_ of a specific html-element (subject). A _boundary_ is in essence an object with the following structure:
 
