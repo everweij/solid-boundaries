@@ -31,7 +31,7 @@ jobs:
         run: pnpm typecheck
 
       - name: Integration test
-        run: pnpm test --coverage
+        run: pnpm test
 
       - name: Browser test
         run: pnpm test:browser:ci

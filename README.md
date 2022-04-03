@@ -119,3 +119,12 @@ type TrackerProps = {
 
 function createBoundaryTracker(config?: Config): TrackerProps;
 ```
+
+## Contributing
+
+Want to contribute to solid-boundaries? Your help is very much appreciated!
+Please consult the [contribution guide](./CONTRIBUTING.MD) on how to get started.
+
+## License
+
+MIT © [everweij](https://github.com/everweij)
