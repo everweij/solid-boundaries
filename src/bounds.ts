@@ -1,4 +1,4 @@
-export interface IBounds {
+export interface Bounds {
   top: number;
   left: number;
   bottom: number;
@@ -7,9 +7,9 @@ export interface IBounds {
   height: number;
 }
 
-export type BoundsKeys = Array<keyof IBounds>;
+export type BoundsKeys = Array<keyof Bounds>;
 
-const allKeys = [
+export const allKeys = [
   "bottom",
   "height",
   "left",
@@ -19,9 +19,17 @@ const allKeys = [
 ] as BoundsKeys;
 
 export function equals(
-  a: IBounds,
-  b: IBounds | null,
+  a: Bounds,
+  b: Bounds | null,
   keys: BoundsKeys = allKeys
 ) {
   return b && keys.every(key => a[key] === b[key]);
 }
+
+export const boundsFromElement = (element: HTMLElement): Bounds => {
+  const domRect = element.getBoundingClientRect();
+  const bounds = Object.fromEntries(
+    allKeys.map(key => [key, domRect[key]])
+  ) as unknown as Bounds;
+  return bounds;
+};

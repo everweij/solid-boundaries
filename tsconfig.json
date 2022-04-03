@@ -1,5 +1,5 @@
 {
-  "include": ["src", "types"],
+  "include": ["src", "types", "browser-tests", "cypress"],
   "compilerOptions": {
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
@@ -19,9 +19,9 @@
     "esModuleInterop": true,
     "module": "esnext",
     "lib": ["dom", "esnext"],
-    "types": ["vitest/globals"],
+    "types": ["vitest/globals", "cypress", "./cypress/cypress"],
     "sourceMap": true,
-    "rootDir": "./src",
+    // "rootDir": "./src",
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "jsx": "preserve",

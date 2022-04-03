@@ -33,5 +33,8 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Browser test
+        run: pnpm test:browser:ci
+
       - name: Build
         run: pnpm build

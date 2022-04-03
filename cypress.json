@@ -1,0 +1,6 @@
+{
+  "component": {
+    "componentFolder": "browser-tests",
+    "testFiles": "**/*.test.{ts,tsx}"
+  }
+}

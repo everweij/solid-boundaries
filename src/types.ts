@@ -1,9 +1,9 @@
 import type { Accessor, Setter } from "solid-js";
-import type { BoundsKeys, IBounds } from "./bounds";
+import type { BoundsKeys, Bounds } from "./bounds";
 
 export type CreateBoundaryTrackerReturn = {
   ref: Setter<HTMLElement | null>;
-  bounds: Accessor<IBounds | null>;
+  bounds: Accessor<Bounds | null>;
   element: Accessor<HTMLElement | null>;
 };
 

@@ -3,9 +3,9 @@ import type {
   CreateBoundaryTrackerConfig,
   CreateBoundaryTrackerReturn
 } from "./types";
-import type { IBounds } from "./bounds";
+import type { Bounds } from "./bounds";
 export type {
-  IBounds,
+  Bounds,
   CreateBoundaryTrackerReturn,
   CreateBoundaryTrackerConfig
 };
@@ -14,7 +14,7 @@ export function createBoundaryTracker(
   _config: CreateBoundaryTrackerConfig = {}
 ): CreateBoundaryTrackerReturn {
   const [element, setElement] = createSignal<HTMLElement | null>(null);
-  const [bounds] = createSignal<IBounds | null>(null);
+  const [bounds] = createSignal<Bounds | null>(null);
 
   return {
     bounds,

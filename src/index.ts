@@ -10,13 +10,13 @@ import type {
   CreateBoundaryTrackerConfig,
   CreateBoundaryTrackerReturn
 } from "./types";
-import type { IBounds } from "./bounds";
-import * as Bounds from "./bounds";
+import type { Bounds } from "./bounds";
+import { equals, boundsFromElement } from "./bounds";
 import { createBatchUpdater } from "./create-batch-updater";
 import { createGlobalObserver } from "./create-global-observer";
 import type { UnregisterFn } from "./create-global-observer";
 export type {
-  IBounds,
+  Bounds,
   CreateBoundaryTrackerReturn,
   CreateBoundaryTrackerConfig
 };
@@ -40,6 +40,21 @@ const registerToScrollEvents = createGlobalObserver<Event>({
     window.addEventListener("scroll", callback, { capture: true }),
   disconnect: callback =>
     window.removeEventListener("scroll", callback, { capture: true })
+});
+
+const registerToBodyResizeEvents = createGlobalObserver<
+  ResizeObserverEntry[],
+  ResizeObserver
+>({
+  init: callback => {
+    let hasTriggeredResize = false;
+    return new ResizeObserver(entries => {
+      if (!hasTriggeredResize) hasTriggeredResize = true;
+      else callback(entries);
+    });
+  },
+  connect: subject => subject.observe(document.body),
+  disconnect: subject => subject.disconnect()
 });
 
 type ElementConnectedTrackerOptions = {
@@ -93,15 +108,15 @@ export function createBoundaryTracker({
 }: CreateBoundaryTrackerConfig = {}): CreateBoundaryTrackerReturn {
   const updater = createBatchUpdater();
   const [element, setElement] = createSignal<HTMLElement | null>(null);
-  const [bounds, setBounds] = createSignal<IBounds | null>(null);
+  const [bounds, setBounds] = createSignal<Bounds | null>(null);
   const isConnected = createElementConnectedTracker(element, {
     onDisconnect: () => setBounds(null)
   });
 
   function calculateBounds() {
-    const newBounds: IBounds = element()!.getBoundingClientRect().toJSON();
+    const newBounds = boundsFromElement(element()!);
     const currentBounds = bounds();
-    if (!Bounds.equals(newBounds, currentBounds, keys)) {
+    if (!equals(newBounds, currentBounds, keys)) {
       updater(() => setBounds(newBounds));
     }
   }
@@ -122,6 +137,7 @@ export function createBoundaryTracker({
         }
 
         const unregisterers = [
+          trackResize && registerToBodyResizeEvents(calculateBounds),
           trackMutations && registerToMutationEvents(calculateBounds),
           trackScroll &&
             registerToScrollEvents(evt => {
