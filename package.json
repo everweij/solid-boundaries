@@ -21,6 +21,9 @@
       "url": "http://www.erikverweij.dev"
     }
   ],
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
