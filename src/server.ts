@@ -3,11 +3,12 @@ import type {
   CreateBoundaryTrackerConfig,
   CreateBoundaryTrackerReturn
 } from "./types";
-import type { Bounds } from "./bounds";
+import type { Bounds, BoundsKeys } from "./bounds";
 export type {
   Bounds,
   CreateBoundaryTrackerReturn,
-  CreateBoundaryTrackerConfig
+  CreateBoundaryTrackerConfig,
+  BoundsKeys
 };
 
 export function createBoundaryTracker(

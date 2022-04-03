@@ -1,15 +1,15 @@
 import { onCleanup } from "solid-js";
 
 /**
- * Utility that ensures that a callback is not called more often
+ * Utility that ensures that a task is not called more often
  * than once per frame.
  */
-export function createBatchUpdater() {
+export function createUpdateThrottler() {
   let handle: number | null = null;
 
   const cancel = () => {
     if (handle) {
-      cancelAnimationFrame(handle);
+      window.cancelAnimationFrame(handle);
       handle = null;
     }
   };

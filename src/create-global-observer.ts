@@ -1,10 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { batch } from "solid-js";
 
 type Callback<Payload> = (payload: Payload) => void;
 export type UnregisterFn = () => void;
-type RegisterFn<Payload> = (callback: Callback<Payload>) => UnregisterFn;
+export type RegisterFn<Payload> = (callback: Callback<Payload>) => UnregisterFn;
 
+/**
+ * Creates a global observer which forwards events to one or
+ * multiple listeners. If there are no listeners, nothing
+ * will be observed.
+ */
 export function createGlobalObserver<Payload, T>(props: {
   init: (handler: Callback<Payload>) => T;
   connect: (subject: T) => void;
@@ -14,6 +18,7 @@ export function createGlobalObserver<Payload>(props: {
   connect: (callback: Callback<Payload>) => void;
   disconnect: (callback: Callback<Payload>) => void;
 }): RegisterFn<Payload>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createGlobalObserver<Payload>(props: any): any {
   const callbacks: Set<Callback<Payload>> = new Set();
 

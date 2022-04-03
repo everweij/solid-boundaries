@@ -1,10 +1,51 @@
+import "./index.css";
 import { render } from "solid-js/web";
-import { createBoundaryTracker } from "..";
-import { createEffect, createSignal } from "solid-js";
-import type { Accessor } from "solid-js";
+import { createBoundaryTracker } from "../src";
+import type { Bounds } from "../src";
+import { createSignal, onMount, createEffect } from "solid-js";
+import { animate } from "motion";
 
-function App2() {
+function BoundInfo(props: { name: string; value: number }) {
+  let ref!: HTMLSpanElement;
+
+  createEffect(prev => {
+    if (prev && prev !== props.value) {
+      animate(
+        ref,
+        {
+          backgroundColor: [null, "var(--primary)", "white"],
+          color: [null, "white", "black"]
+        },
+        { duration: 0.3 }
+      );
+    }
+    return props.value;
+  });
+
+  return (
+    <div class="data">
+      <span>{props.name}:</span>{" "}
+      <span ref={ref}>{Math.round(props.value)}px</span>
+    </div>
+  );
+}
+
+function BoundsInfo(props: { bounds: Bounds }) {
+  return (
+    <div class="menu-bounds">
+      <BoundInfo name="top" value={props.bounds.top} />
+      <BoundInfo name="left" value={props.bounds.left} />
+      <BoundInfo name="right" value={props.bounds.right} />
+      <BoundInfo name="bottom" value={props.bounds.bottom} />
+      <BoundInfo name="width" value={props.bounds.width} />
+      <BoundInfo name="height" value={props.bounds.height} />
+    </div>
+  );
+}
+
+function ButtonWithMenu() {
   const [isOpen, setOpen] = createSignal(false);
+  const [isLarge, setLarge] = createSignal(false);
 
   const trigger = createBoundaryTracker({
     enabled: isOpen
@@ -17,107 +58,83 @@ function App2() {
 
   const hasAllBounds = () => trigger.bounds() && layer.bounds();
 
-  const layerTransform = () => {
+  const layerPosition = () => {
     if (!hasAllBounds()) {
-      return "translate(0px, 0px)";
+      return { top: "0px", left: "0px" };
     }
 
-    const x =
-      trigger.bounds()!.left +
-      trigger.bounds()!.width / 2 -
-      layer.bounds()!.width / 2;
-    const y = trigger.bounds()!.bottom;
-
-    return `translate(${x}px, ${y}px)`;
+    const { left, width, bottom } = trigger.bounds()!;
+    const { width: layerWidth } = layer.bounds()!;
+    return {
+      left: left + width / 2 - layerWidth / 2 + "px",
+      top: bottom + "px"
+    };
   };
 
   return (
-    <div style={{ height: "200vh", padding: "64px 128px" }}>
-      <button ref={trigger.ref} onClick={() => setOpen(!isOpen())}>
+    <>
+      <button
+        ref={trigger.ref}
+        classList={{ large: isLarge() }}
+        onClick={() => setOpen(!isOpen())}
+      >
         Toggle
       </button>
       {isOpen() && (
         <div
           ref={layer.ref}
+          class="menu"
+          onClick={() => setLarge(!isLarge())}
           style={{
-            // visibility: hasAllBounds() ? "visible" : "hidden",
-            transform: layerTransform(),
-            width: "200px",
-            height: "200px",
-            position: "fixed",
-            top: 0,
-            left: 0,
-            "background-color": "green"
+            visibility: hasAllBounds() ? "visible" : "hidden",
+            ...layerPosition()
           }}
         >
-          Menu
+          <div>
+            <div class="menu-title">Trigger bounds:</div>
+            {trigger.bounds() && <BoundsInfo bounds={trigger.bounds()} />}
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
-type BoxProps = { color: string; active: boolean; enabled: Accessor<boolean> };
+function Example() {
+  let scrollBox: HTMLDivElement;
 
-function Box(props: BoxProps) {
-  const tracker = createBoundaryTracker({
-    enabled: props.enabled
+  onMount(() => {
+    const { width: scrollBoxWidth, height: scrollBoxHeight } =
+      scrollBox.getBoundingClientRect();
+    const { width: innerWidh, height: innerHeight } =
+      scrollBox.children[0].getBoundingClientRect();
+
+    scrollBox.scrollLeft = innerWidh / 2 - scrollBoxWidth / 2;
+    scrollBox.scrollTop = innerHeight / 2 - scrollBoxHeight / 2;
   });
 
   return (
-    <div
-      ref={tracker.ref}
-      {...props}
-      style={{
-        "background-color": props.color,
-        height: props.active ? "200px" : "100px",
-        width: props.active ? "200px" : "100px",
-        margin: "64px",
-        transition: "0.3s"
-      }}
-    >
-      {tracker.bounds() && (
-        <>
-          <div>x: {Math.round(tracker.bounds().left)}</div>
-          <div>y: {Math.round(tracker.bounds().top)}</div>
-          <div>width: {Math.round(tracker.bounds().width)}</div>
-          <div>height: {Math.round(tracker.bounds().height)}</div>
-        </>
-      )}
-    </div>
-  );
-}
-
-export function App() {
-  const [active, setActive] = createSignal(false);
-  const [enabled, setEnabled] = createSignal(true);
-
-  return (
-    <div
-      style={{
-        height: "200vh",
-        padding: "64px"
-      }}
-    >
-      <button onClick={() => setActive(!active())}>Toggle Box</button>
-      <button onClick={() => setEnabled(!enabled())}>
-        {enabled() ? "Untrack" : "Track"}
-      </button>
-      <Box active={active()} color="red" enabled={enabled} />
-      <Box active={!active()} color="blue" enabled={enabled} />
-      <div
-        style={{
-          height: "500px",
-          "background-color": "lightgray",
-          overflow: "auto"
-        }}
-      >
-        <div style={{ height: "5000px" }}>
-          <Box active={active()} color="red" enabled={enabled} />
-        </div>
+    <>
+      <div class="container">
+        <header>
+          <a href="https://www.github.com/everweij/solid-boundaries">
+            <h1>solid-boundaries</h1>
+          </a>
+          <p>A utility to track the boundaries of html-elements in solid-js</p>
+          <p>
+            Scroll arround, resize the window or click on the menu to see the
+            boundaries changing...
+          </p>
+        </header>
+        <main ref={scrollBox} class="scroll-box">
+          <div class="inner">
+            <ButtonWithMenu />
+          </div>
+        </main>
       </div>
-    </div>
+      <div class="filler" />
+    </>
   );
 }
 
-render(() => <App2 />, document.getElementById("root")!);
+render(() => <Example />, document.getElementById("root")!);

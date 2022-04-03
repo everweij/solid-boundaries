@@ -5,20 +5,21 @@ import {
   createRenderEffect,
   on
 } from "solid-js";
-import type { Accessor } from "solid-js";
+import type { Accessor, Setter } from "solid-js";
 import type {
   CreateBoundaryTrackerConfig,
   CreateBoundaryTrackerReturn
 } from "./types";
-import type { Bounds } from "./bounds";
+import type { Bounds, BoundsKeys } from "./bounds";
 import { equals, boundsFromElement } from "./bounds";
-import { createBatchUpdater } from "./create-batch-updater";
+import { createUpdateThrottler } from "./create-update-throttler";
 import { createGlobalObserver } from "./create-global-observer";
 import type { UnregisterFn } from "./create-global-observer";
 export type {
   Bounds,
   CreateBoundaryTrackerReturn,
-  CreateBoundaryTrackerConfig
+  CreateBoundaryTrackerConfig,
+  BoundsKeys
 };
 
 const registerToMutationEvents = createGlobalObserver<
@@ -57,11 +58,6 @@ const registerToBodyResizeEvents = createGlobalObserver<
   disconnect: subject => subject.disconnect()
 });
 
-type ElementConnectedTrackerOptions = {
-  onConnect?: () => void;
-  onDisconnect?: () => void;
-};
-
 const listContainsNode = (list: NodeList, element: HTMLElement | null) => {
   for (let i = 0; i < list.length; i++) {
     if (list[i] === element || list[i].contains(element)) {
@@ -71,13 +67,20 @@ const listContainsNode = (list: NodeList, element: HTMLElement | null) => {
   return false;
 };
 
+type ElementConnectedTrackerOptions = {
+  onConnect?: () => void;
+  onDisconnect?: () => void;
+};
+
+// Utility function which tracks and allows you to respond to when
+// an element is connected / disconnected to the DOM.
 function createElementConnectedTracker(
   element: Accessor<HTMLElement | null>,
   opts: ElementConnectedTrackerOptions = {}
 ) {
   const [isConnected, setConnected] = createSignal(false);
 
-  createRenderEffect(() =>
+  createRenderEffect(() => {
     onCleanup(
       registerToMutationEvents(mutations => {
         for (const mutation of mutations) {
@@ -93,29 +96,48 @@ function createElementConnectedTracker(
           }
         }
       })
-    )
-  );
+    );
+  });
 
   return isConnected;
 }
 
+/**
+ * Reactive primitive which tracks the boundaries of a specific html-element
+ *
+ * @example
+ * ```tsx
+ * function App() {
+ *   const tracker = createBoundaryTracker();
+ *
+ *   return (
+ *     <div ref={tracker.ref}>
+ *       {tracker.bounds() && JSON.stringify(tracker.bounds())}
+ *     </div>
+ *   );
+ * }
+ * ```
+ */
 export function createBoundaryTracker({
   enabled = () => true,
   keys,
   trackMutations = true,
   trackResize = true,
-  trackScroll = true
+  trackScroll = true,
+  suppressWarnings = false
 }: CreateBoundaryTrackerConfig = {}): CreateBoundaryTrackerReturn {
-  const updater = createBatchUpdater();
+  const updater = createUpdateThrottler();
   const [element, setElement] = createSignal<HTMLElement | null>(null);
-  const [bounds, setBounds] = createSignal<Bounds | null>(null);
+  const [_bounds, setBounds] = createSignal<Bounds | null>(null);
   const isConnected = createElementConnectedTracker(element, {
     onDisconnect: () => setBounds(null)
   });
 
+  // Checks whether the bounds have actually changed.
+  // If so, schedule an update.
   function calculateBounds() {
     const newBounds = boundsFromElement(element()!);
-    const currentBounds = bounds();
+    const currentBounds = _bounds();
     if (!equals(newBounds, currentBounds, keys)) {
       updater(() => setBounds(newBounds));
     }
@@ -123,9 +145,12 @@ export function createBoundaryTracker({
 
   createEffect(
     on([enabled, isConnected], () => {
+      // If the element is not connected, or the user has
+      // not enabled tracking, we don't need to do anything.
       if (enabled() && isConnected()) {
         calculateBounds();
 
+        // resize-observer for the local element
         let resizeObserver: ResizeObserver | null = null;
         if (trackResize) {
           let hasTriggeredResize = false;
@@ -136,6 +161,7 @@ export function createBoundaryTracker({
           resizeObserver.observe(element()!);
         }
 
+        // register for events that can occur somewhere in the DOM
         const unregisterers = [
           trackResize && registerToBodyResizeEvents(calculateBounds),
           trackMutations && registerToMutationEvents(calculateBounds),
@@ -155,9 +181,28 @@ export function createBoundaryTracker({
     })
   );
 
+  // Warning stuff...
+  let hasCalledRef = false;
+  let hasWarned = false;
+  const bounds = suppressWarnings
+    ? _bounds
+    : () => {
+        if (!hasCalledRef && !hasWarned) {
+          console.warn(
+            `createBoundaryTracker(): you are trying to read the bounds of an element but it seems that you haven't attached the 'ref' properly yet.`
+          );
+          hasWarned = true;
+        }
+
+        return _bounds();
+      };
+
   return {
     bounds,
-    ref: setElement,
+    ref: (element => {
+      hasCalledRef = true;
+      setElement(element);
+    }) as Setter<HTMLElement | null>,
     element
   };
 }

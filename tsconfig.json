@@ -19,7 +19,7 @@
     "esModuleInterop": true,
     "module": "esnext",
     "lib": ["dom", "esnext"],
-    "types": ["vitest/globals", "cypress", "./cypress/cypress"],
+    "types": ["cypress", "./cypress/cypress"],
     "sourceMap": true,
     // "rootDir": "./src",
     "noImplicitReturns": true,

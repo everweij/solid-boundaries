@@ -26,16 +26,15 @@ export default defineConfig({
   test: {
     dir: "./src",
     environment: "jsdom",
-    setupFiles: "./setup-vitest.ts",
-    globals: true,
+    globals: false,
     transformMode: {
       web: [/\.tsx?$/]
     },
     deps: {
       inline: [/solid-js/]
     },
-    threads: false,
-    isolate: false
+    threads: true,
+    isolate: true
   },
 
   resolve: {

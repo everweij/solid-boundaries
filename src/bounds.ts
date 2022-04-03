@@ -18,6 +18,9 @@ export const allKeys = [
   "width"
 ] as BoundsKeys;
 
+/**
+ * Check if two bounds are equal.
+ */
 export function equals(
   a: Bounds,
   b: Bounds | null,
@@ -26,6 +29,9 @@ export function equals(
   return b && keys.every(key => a[key] === b[key]);
 }
 
+/**
+ * Creates bounds from an element.
+ */
 export const boundsFromElement = (element: HTMLElement): Bounds => {
   const domRect = element.getBoundingClientRect();
   const bounds = Object.fromEntries(

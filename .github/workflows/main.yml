@@ -30,8 +30,8 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      - name: Test
-        run: pnpm test
+      - name: Integration test
+        run: pnpm test --coverage
 
       - name: Browser test
         run: pnpm test:browser:ci
