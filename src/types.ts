@@ -1,7 +1,7 @@
 import type { Accessor, Setter } from "solid-js";
 import type { BoundsKeys, Bounds } from "./bounds";
 
-export type CreateBoundaryTrackerReturn = {
+export type TrackBoundsProps = {
   /**
    * Setter which should be passed to the `ref` prop of the
    * element you want to track.
@@ -19,7 +19,7 @@ export type CreateBoundaryTrackerReturn = {
   element: Accessor<HTMLElement | null>;
 };
 
-export interface CreateBoundaryTrackerConfig {
+export interface TrackBoundsConfig {
   /**
    * Whether to actively track the element's position.
    * @default () => true

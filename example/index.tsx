@@ -1,6 +1,6 @@
 import "./index.css";
 import { render } from "solid-js/web";
-import { createBoundaryTracker } from "../src";
+import { trackBounds } from "../src";
 import type { Bounds } from "../src";
 import { createSignal, onMount, createEffect } from "solid-js";
 import { animate } from "motion";
@@ -47,11 +47,11 @@ function ButtonWithMenu() {
   const [isOpen, setOpen] = createSignal(false);
   const [isLarge, setLarge] = createSignal(false);
 
-  const trigger = createBoundaryTracker({
+  const trigger = trackBounds({
     enabled: isOpen
   });
 
-  const layer = createBoundaryTracker({
+  const layer = trackBounds({
     enabled: isOpen,
     keys: ["width", "height"]
   });
@@ -120,10 +120,10 @@ function Example() {
           <a href="https://www.github.com/everweij/solid-boundaries">
             <h1>solid-boundaries</h1>
           </a>
-          <p>A utility to track the boundaries of html-elements in solid-js</p>
+          <p>A utility to track the bounds of html-elements in solid-js</p>
           <p>
             Scroll arround, resize the window or click on the menu to see the
-            boundaries changing...
+            bounds changing...
           </p>
         </header>
         <main ref={scrollBox} class="scroll-box">

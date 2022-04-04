@@ -6,21 +6,16 @@ import {
   on
 } from "solid-js";
 import type { Accessor, Setter } from "solid-js";
-import type {
-  CreateBoundaryTrackerConfig,
-  CreateBoundaryTrackerReturn
-} from "./types";
+import type { TrackBoundsConfig, TrackBoundsProps } from "./types";
 import type { Bounds, BoundsKeys } from "./bounds";
 import { equals, boundsFromElement } from "./bounds";
 import { createUpdateThrottler } from "./create-update-throttler";
 import { createGlobalObserver } from "./create-global-observer";
 import type { UnregisterFn } from "./create-global-observer";
-export type {
-  Bounds,
-  CreateBoundaryTrackerReturn,
-  CreateBoundaryTrackerConfig,
-  BoundsKeys
-};
+export type { Bounds, TrackBoundsProps, TrackBoundsConfig, BoundsKeys };
+
+const hasResizeObserver = typeof ResizeObserver !== "undefined";
+const hasMutationObserver = typeof MutationObserver !== "undefined";
 
 const registerToMutationEvents = createGlobalObserver<
   MutationRecord[],
@@ -67,16 +62,16 @@ const listContainsNode = (list: NodeList, element: HTMLElement | null) => {
   return false;
 };
 
-type ElementConnectedTrackerOptions = {
+type TrackElementOptions = {
   onConnect?: () => void;
   onDisconnect?: () => void;
 };
 
 // Utility function which tracks and allows you to respond to when
 // an element is connected / disconnected to the DOM.
-function createElementConnectedTracker(
+function trackElementConnected(
   element: Accessor<HTMLElement | null>,
-  opts: ElementConnectedTrackerOptions = {}
+  opts: TrackElementOptions = {}
 ) {
   const [isConnected, setConnected] = createSignal(false);
 
@@ -103,33 +98,33 @@ function createElementConnectedTracker(
 }
 
 /**
- * Reactive primitive which tracks the boundaries of a specific html-element
+ * Reactive primitive which tracks the bounds of a specific html-element
  *
  * @example
  * ```tsx
  * function App() {
- *   const tracker = createBoundaryTracker();
+ *   const { ref, bounds } = trackBounds();
  *
  *   return (
- *     <div ref={tracker.ref}>
- *       {tracker.bounds() && JSON.stringify(tracker.bounds())}
+ *     <div ref={ref}>
+ *       {bounds() && JSON.stringify(bounds())}
  *     </div>
  *   );
  * }
  * ```
  */
-export function createBoundaryTracker({
+export function trackBounds({
   enabled = () => true,
   keys,
   trackMutations = true,
   trackResize = true,
   trackScroll = true,
   suppressWarnings = false
-}: CreateBoundaryTrackerConfig = {}): CreateBoundaryTrackerReturn {
+}: TrackBoundsConfig = {}): TrackBoundsProps {
   const updater = createUpdateThrottler();
   const [element, setElement] = createSignal<HTMLElement | null>(null);
   const [_bounds, setBounds] = createSignal<Bounds | null>(null);
-  const isConnected = createElementConnectedTracker(element, {
+  const isConnected = trackElementConnected(element, {
     onDisconnect: () => setBounds(null)
   });
 
@@ -152,7 +147,7 @@ export function createBoundaryTracker({
 
         // resize-observer for the local element
         let resizeObserver: ResizeObserver | null = null;
-        if (trackResize) {
+        if (trackResize && hasResizeObserver) {
           let hasTriggeredResize = false;
           resizeObserver = new ResizeObserver(() => {
             if (!hasTriggeredResize) hasTriggeredResize = true;
@@ -163,8 +158,12 @@ export function createBoundaryTracker({
 
         // register for events that can occur somewhere in the DOM
         const unregisterers = [
-          trackResize && registerToBodyResizeEvents(calculateBounds),
-          trackMutations && registerToMutationEvents(calculateBounds),
+          hasResizeObserver &&
+            trackResize &&
+            registerToBodyResizeEvents(calculateBounds),
+          hasMutationObserver &&
+            trackMutations &&
+            registerToMutationEvents(calculateBounds),
           trackScroll &&
             registerToScrollEvents(evt => {
               if ((evt.target as HTMLElement).contains(element())) {
@@ -189,7 +188,7 @@ export function createBoundaryTracker({
     : () => {
         if (!hasCalledRef && !hasWarned) {
           console.warn(
-            `createBoundaryTracker(): you are trying to read the bounds of an element but it seems that you haven't attached the 'ref' properly yet.`
+            `trackBounds(): you are trying to read the bounds of an element but it seems that you haven't attached the 'ref' properly yet.`
           );
           hasWarned = true;
         }

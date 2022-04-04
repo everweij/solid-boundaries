@@ -1,19 +1,11 @@
 import { createSignal } from "solid-js";
-import type {
-  CreateBoundaryTrackerConfig,
-  CreateBoundaryTrackerReturn
-} from "./types";
+import type { TrackBoundsConfig, TrackBoundsProps } from "./types";
 import type { Bounds, BoundsKeys } from "./bounds";
-export type {
-  Bounds,
-  CreateBoundaryTrackerReturn,
-  CreateBoundaryTrackerConfig,
-  BoundsKeys
-};
+export type { Bounds, TrackBoundsConfig, TrackBoundsProps, BoundsKeys };
 
 export function createBoundaryTracker(
-  _config: CreateBoundaryTrackerConfig = {}
-): CreateBoundaryTrackerReturn {
+  _config: TrackBoundsConfig = {}
+): TrackBoundsProps {
   const [element, setElement] = createSignal<HTMLElement | null>(null);
   const [bounds] = createSignal<Bounds | null>(null);
 

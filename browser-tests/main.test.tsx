@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "solid-js";
 import { Show, createSignal } from "solid-js";
-import { createBoundaryTracker } from "../src";
+import { trackBounds } from "../src";
 import { storeBounds, checkBounds, render, unmount } from "./helper";
 
 const Container = (props: PropsWithChildren) => (
@@ -50,7 +50,7 @@ function Box(props: {
   large?: boolean;
   right?: boolean;
 }) {
-  const tracker = createBoundaryTracker();
+  const tracker = trackBounds();
 
   storeBounds(props.id, tracker.bounds);
 
@@ -114,7 +114,7 @@ beforeEach(() => {
   render(() => <Test />);
 });
 
-describe("createBoundaryTracker", () => {
+describe("trackBounds", () => {
   it("measures the bounds of the boxes correctly after first mount", () => {
     checkBounds();
   });

@@ -1,6 +1,6 @@
 {
   "name": "solid-boundaries",
-  "description": "A utility to track the boundaries of html-elements in solid-js",
+  "description": "A utility to track the bounds of html-elements in solid-js",
   "keywords": [
     "solidhack",
     "best_ecosystem",
@@ -8,11 +8,12 @@
     "solid",
     "js",
     "solid-js",
+    "size",
+    "position",
     "resize",
-    "bounds",
-    "boundaries"
+    "bounds"
   ],
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "Erik Verweij",
   "contributors": [
     {
@@ -21,6 +22,11 @@
       "url": "http://www.erikverweij.dev"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/everweij/solid-boundaries"
+  },
+  "homepage": "https://7j26ix.sse.codesandbox.io/",
   "files": [
     "dist"
   ],

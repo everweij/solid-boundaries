@@ -75,7 +75,7 @@ class MockMutationObserver {
 vi.stubGlobal("ResizeObserver", MockResizeObserver);
 vi.stubGlobal("MutationObserver", MockMutationObserver);
 
-import { createBoundaryTracker } from ".";
+import { trackBounds } from ".";
 
 function fakeElementConnectedMutation() {
   const addedMutation = {
@@ -84,10 +84,10 @@ function fakeElementConnectedMutation() {
   MockMutationObserver.trigger([addedMutation]);
 }
 
-describe("createBoundaryTracker", () => {
+describe("trackBounds", () => {
   it("it does not do anything untill the element is connected to the DOM", () => {
     return createRoot(async dispose => {
-      const tracker = createBoundaryTracker();
+      const tracker = trackBounds();
       tracker.ref(fakeElement);
       await nextTick();
 
@@ -100,7 +100,7 @@ describe("createBoundaryTracker", () => {
 
   it("provides the bounds once the element is connected to the DOM", () => {
     return createRoot(async dispose => {
-      const tracker = createBoundaryTracker();
+      const tracker = trackBounds();
       tracker.ref(fakeElement);
       await nextTick();
 
@@ -117,7 +117,7 @@ describe("createBoundaryTracker", () => {
     return createRoot(async dispose => {
       const [enabled, setEnabled] = createSignal(false);
 
-      const tracker = createBoundaryTracker({ enabled });
+      const tracker = trackBounds({ enabled });
       tracker.ref(fakeElement);
       await nextTick();
 
