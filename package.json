@@ -1,6 +1,7 @@
 {
   "name": "solid-boundaries",
   "description": "A utility to track the bounds of html-elements in solid-js",
+  "info": "This small library exposes a small reactive primitive which tracks the size and position (bounds) of a specific html-element (subject). This is useful for all kinds of things, like building tooltips, popovers, or other behavior and interactions related to changes regarding size and positions. Bounds update in response to: scrolling (the entire window as well as nested scroll-containers), resizing (the entire window as well as the subject) and mutations in the document.",
   "keywords": [
     "solidhack",
     "best_ecosystem",
