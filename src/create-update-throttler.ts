@@ -1,29 +1,33 @@
 import { onCleanup } from "solid-js";
 
+type Callback = () => void;
+
 /**
  * Utility that ensures that a task is not called more often
  * than once per frame.
  */
 export function createUpdateThrottler() {
-  let handle: number | null = null;
+  let cancelled = false,
+    isUpdating = false,
+    latestCallBack: Callback | null = null;
 
-  const cancel = () => {
-    if (handle) {
-      window.cancelAnimationFrame(handle);
-      handle = null;
+  const updater = async (callback: Callback) => {
+    latestCallBack = callback;
+    if (isUpdating || cancelled) {
+      return;
+    }
+
+    isUpdating = true;
+    await Promise.resolve();
+
+    if (!cancelled) {
+      isUpdating = false;
+      latestCallBack();
+      latestCallBack = null;
     }
   };
 
-  const updater = (callback: () => void) => {
-    cancel();
-
-    handle = window.requestAnimationFrame(() => {
-      callback();
-      handle = null;
-    });
-  };
-
-  onCleanup(cancel);
+  onCleanup(() => (cancelled = true));
 
   return updater;
 }

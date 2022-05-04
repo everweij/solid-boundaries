@@ -110,7 +110,7 @@ button.large {
   width: 200px;
   height: 200px;
   cursor: pointer;
-  will-change: top, left;
+  will-change: transform, top, left;
 }
 
 .menu-title {

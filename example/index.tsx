@@ -44,31 +44,30 @@ function BoundsInfo(props: { bounds: Bounds }) {
 }
 
 function ButtonWithMenu() {
-  const [isOpen, setOpen] = createSignal(false);
+  const [enabled, setEnabled] = createSignal(false);
   const [isLarge, setLarge] = createSignal(false);
 
   const trigger = trackBounds({
-    enabled: isOpen
+    enabled
   });
 
   const layer = trackBounds({
-    enabled: isOpen,
+    enabled,
     keys: ["width", "height"]
   });
 
-  const hasAllBounds = () => trigger.bounds() && layer.bounds();
-
   const layerPosition = () => {
-    if (!hasAllBounds()) {
+    if (!trigger.bounds() || !layer.bounds()) {
       return { top: "0px", left: "0px" };
     }
 
     const { left, width, bottom } = trigger.bounds()!;
     const { width: layerWidth } = layer.bounds()!;
-    return {
+    const pos = {
       left: left + width / 2 - layerWidth / 2 + "px",
       top: bottom + "px"
     };
+    return { transform: `translate(${pos.left}, ${pos.top})` };
   };
 
   return (
@@ -76,19 +75,16 @@ function ButtonWithMenu() {
       <button
         ref={trigger.ref}
         classList={{ large: isLarge() }}
-        onClick={() => setOpen(!isOpen())}
+        onClick={() => setEnabled(!enabled())}
       >
         Toggle
       </button>
-      {isOpen() && (
+      {enabled() && (
         <div
           ref={layer.ref}
           class="menu"
           onClick={() => setLarge(!isLarge())}
-          style={{
-            visibility: hasAllBounds() ? "visible" : "hidden",
-            ...layerPosition()
-          }}
+          style={layerPosition()}
         >
           <div>
             <div class="menu-title">Trigger bounds:</div>
